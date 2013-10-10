@@ -23,6 +23,9 @@
 ;;; Commentary:
 
 ;; Māori language dictionary for helm.
+;;
+;; Searches for the term on <http://www.maoridictionary.co.nz>, then parses the HTML
+;; page into a list of search results to display.
 
 ;;; Code:
 
@@ -79,8 +82,6 @@
            (-map 'mdict:def->string)
            (-remove (-compose 's-blank? 's-trim))
            (--map (concat word " : " it))))))))
-
-;;; Main functions
 
 (defun mdict:format-query-url (query)
   (concat "http://www.maoridictionary.co.nz/index.cfm"
