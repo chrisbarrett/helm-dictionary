@@ -73,12 +73,12 @@
         (delete-trailing-whitespace)))))
 
 (defun mdict:plist->definitions (plist)
-  (->> (assoc-in '(body div div article article) plist)
+  (->> (hdict:assoc-in '(body div div article article) plist)
     (-drop 2)
     (-mapcat
      (lambda (section)
-       (let ((word (cadr (assoc-in '(div h2) section))))
-         (->> (cdr (assoc-in '(ul li) section))
+       (let ((word (cadr (hdict:assoc-in '(div h2) section))))
+         (->> (cdr (hdict:assoc-in '(ul li) section))
            (-map 'mdict:def->string)
            (-remove (-compose 's-blank? 's-trim))
            (--map (concat word " : " it))))))))

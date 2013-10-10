@@ -26,7 +26,15 @@
 
 ;;; Code:
 
-;; Convert Elisp plist representations of the web page into strings.
+(defun hdict:assoc-in (path alist)
+  "Traverse ALIST along the given PATH of keys using `assoc'.
+Return nil if the path cannot be followed."
+  (if (and path alist)
+      (cl-destructuring-bind (cur &rest next) path
+        (assoc-in next (cdr (assoc cur alist))))
+    alist))
+
+;; Plist conversion.
 
 (cl-defun hdict:a->string ((_a _href str)) (propertize str 'face 'italic))
 (cl-defun hdict:i->string ((_i _ str)) (propertize str 'face 'italic))
