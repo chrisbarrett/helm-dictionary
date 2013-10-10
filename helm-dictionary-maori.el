@@ -26,50 +26,15 @@
 
 ;;; Code:
 
+(require 'helm)
 (require 'cl-lib)
 (require 's)
 (require 'dash)
 (require 'dash-functional)
-
-;;; Parsers
-;;;
-;;; Convert Elisp plist representations of the web page into strings.
-
-(cl-defun mdict:a->string ((_a _href str)) (propertize str 'face 'italic))
-(cl-defun mdict:i->string ((_i _ str)) (propertize str 'face 'italic))
-(cl-defun mdict:b->string ((_b _ str)) (propertize str 'face 'bold))
-(cl-defun mdict:strong->string ((_strong _ str)) (propertize str 'face 'bold))
-(cl-defun mdict:br->string (&rest _) "\n")
-(cl-defun mdict:em->string ((_em &rest content))
-  (concat "\n\n"
-          (propertize (apply 'concat (-map 'mdict:element->string content))
-                      'face 'italic)))
-
-(defun mdict:element->string (x)
-  (cond
-   ((equal "\n" x) "")
-   ((stringp x) x)
-   ((listp x)
-    (cl-case (car x)
-      ('a (mdict:a->string x))
-      ('i (mdict:i->string x))
-      ('em (mdict:em->string x))
-      ('b (mdict:b->string x))
-      ('strong (mdict:strong->string x))
-      ('br (mdict:br->string x))
-      ('comment "")
-      ('article "")
-      ('class "")
-      ('header "")
-      ('div (mdict:element->string (cdr x)))
-      (nil "")
-      (otherwise
-       (apply 'concat (-map 'mdict:element->string x)))))
-   (t
-    "")))
+(require 'helm-dictionary-xml)
 
 (defun mdict:def->string (def)
-  (let ((text (apply 'concat (-map 'mdict:element->string def))))
+  (let ((text (apply 'concat (-map 'hdict:element->string def))))
     (s-with-temp-buffer
       ;; Remove junk chars and insert.
       (insert (s-replace " " " " text))
