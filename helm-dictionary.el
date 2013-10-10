@@ -1,4 +1,4 @@
-;;; helm-dictionary.el --- Dictionary views for Helm
+;;; helm-dictionary.el --- Dictionary commands for Helm
 
 ;; Copyright (C) 2013 Chris Barrett
 
@@ -23,12 +23,11 @@
 
 ;;; Commentary:
 
-;; Dictionary views for Helm.
+;; Dictionary commands for Helm.
 
 ;;; Code:
 
-(require 'helm)
-(declare-function 'helm-dictionary-maori "helm-dictionary-maori")
+(autoload 'helm-dictionary-maori "helm-dictionary-maori")
 
 (provide 'helm-dictionary)
 
