@@ -38,7 +38,7 @@
 
 (defun mdict:def->string (def)
   (let ((text (apply 'concat (-map 'hdict:element->string def))))
-    (s-with-temp-buffer
+    (with-temp-buffer
       ;; Remove junk chars and insert.
       (insert (s-replace " " " " text))
       (goto-char (point-min))
@@ -69,8 +69,11 @@
                             (fringe-columns 'right))))
         (fill-region (point-min) (point-max)))
 
+      ;; Cleanup.
       (let ((delete-trailing-lines t))
-        (delete-trailing-whitespace)))))
+        (delete-trailing-whitespace))
+
+      (buffer-string))))
 
 (defun mdict:plist->definitions (plist)
   (->> (hdict:assoc-in '(body div div article article) plist)
