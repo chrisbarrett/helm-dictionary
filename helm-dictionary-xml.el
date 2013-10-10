@@ -27,12 +27,35 @@
 ;;; Code:
 
 (defun hdict:assoc-in (path alist)
-  "Traverse ALIST along the given PATH of keys using `assoc'.
-Return nil if the path cannot be followed."
+  "Traverse xml ALIST along the given PATH of keys using `assoc'.
+Return nil if the path cannot be followed.
+
+Each element of PATH my be either a symbol or a list of the form
+ (tag [:id|:class] \"label\"), which will attempt to match 'tag'
+with the given id or class."
   (if (and path alist)
       (cl-destructuring-bind (cur &rest next) path
-        (assoc-in next (cdr (assoc cur alist))))
+        ;; If the current item it the path is a list, treat it as a keyword list.
+        (if (listp cur)
+            (cl-destructuring-bind (tag &key id class) cur
+              ;; Find the first tag matching the given class or id.
+              (hdict:assoc-in
+               next
+               (cdr
+                (cl-loop for x in alist
+                         if (consp x)
+                         if (or (and class (equal class (hdict:tag-class x)))
+                                (and id (equal id (hdict:tag-id x))))
+                         do (return x)))))
+
+          (hdict:assoc-in next (cdr (assoc cur alist)))))
     alist))
+
+(cl-defun hdict:tag-id ((&optional tag attrs &rest rest_))
+  (cdr (assoc 'id attrs)))
+
+(cl-defun hdict:tag-class ((&optional tag attrs &rest rest_))
+  (cdr (assoc 'class attrs)))
 
 ;; Plist conversion.
 
