@@ -1,0 +1,14 @@
+#+TITLE: Helm Dictionary
+#+AUTHOR: Chris Barrett
+
+* Description
+Provides functions for searching online dictionaries using helm.
+
+* Supported languages
+- Māori
+
+* Contributing
+Pull requests to add more dictionaries are welcome.
+
+* Licence
+[[http://www.gnu.org/licenses/quick-guide-gplv3.html][GNU GPL 3]]
