@@ -37,22 +37,19 @@
 (require 'helm-dictionary-xml)
 
 (defun mdict:def->string (def)
-  (let ((text (apply 'concat (-map 'hdict:element->string def))))
+  (let ((text (hdict:element->string def)))
     (with-temp-buffer
       ;; Remove junk chars and insert.
       (insert (s-replace " " " " text))
       (goto-char (point-min))
-
       ;; Add a space in padding between numbers and word category.
       (save-excursion
         (while (search-forward-regexp (rx (group (+ digit) ".")) nil t)
           (just-one-space)))
-
       ;; Delete trailing braces.
       (save-excursion
         (while (search-forward-regexp (rx (group (any "()")) (* space) eol) nil t)
           (replace-match "" nil nil nil 1)))
-
       ;; Delete text references, eg:
       ;;
       ;;   Te Māhuri Textbook (Ed. 2): 181-187
@@ -63,28 +60,34 @@
                     eol) nil t)
           (replace-match "")))
 
-      ;; Fill the text to the width of the helm window.
-      (let ((fill-column (- (window-width)
-                            (fringe-columns 'left)
-                            (fringe-columns 'right))))
-        (fill-region (point-min) (point-max)))
-
-      ;; Cleanup.
-      (let ((delete-trailing-lines t))
-        (delete-trailing-whitespace))
-
       (buffer-string))))
 
+(defun mdict:find-defs (plist)
+  (-drop 2 (hdict:assoc-in '(body div div article article) plist)))
+
+(defun mdict:format-candidate (s)
+  "Refill the candidate and remove trailing spaces."
+  (with-temp-buffer
+    (insert s)
+    ;; Cleanup.
+    (let ((delete-trailing-lines t))
+      (delete-trailing-whitespace))
+    ;; Fill the text to the width of the helm window.
+    (let ((fill-column (- (window-width)
+                          (fringe-columns 'left)
+                          (fringe-columns 'right))))
+      (fill-region (point-min) (point-max)))
+    (buffer-string)))
+
 (defun mdict:plist->definitions (plist)
-  (->> (hdict:assoc-in '(body div div article article) plist)
-    (-drop 2)
-    (-mapcat
-     (lambda (section)
-       (let ((word (cadr (hdict:assoc-in '(div h2) section))))
-         (->> (cdr (hdict:assoc-in '(ul li) section))
-           (-map 'mdict:def->string)
-           (-remove (-compose 's-blank? 's-trim))
-           (--map (concat word " : " it))))))))
+  (-mapcat
+   (lambda (section)
+     (let ((word (cadr (hdict:assoc-in '(div h2) section))))
+       (->> (cdr (hdict:assoc-in '(ul li) section))
+         (-map 'mdict:def->string)
+         (-remove (-compose 's-blank? 's-trim))
+         (--map (mdict:format-candidate (concat word " : " it))))))
+   (mdict:find-defs plist)))
 
 (defun mdict:format-query-url (query)
   (concat "http://www.maoridictionary.co.nz/index.cfm"
@@ -103,7 +106,8 @@
 
 (defvar helm-source-maori-dictionary
   '((name . "Māori Dictionary")
-    (candidates . (lambda () (maori-dictionary-search helm-pattern)))
+    (candidates . (lambda ()
+                    (maori-dictionary-search helm-pattern)))
     (action . mdict:open-in-browser)
     (volatile)
     (multiline)
