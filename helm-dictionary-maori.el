@@ -77,7 +77,7 @@
                           (fringe-columns 'left)
                           (fringe-columns 'right))))
       (fill-region (point-min) (point-max)))
-    (buffer-string)))
+    (s-trim (buffer-string))))
 
 (defun mdict:plist->definitions (plist)
   (-mapcat
