@@ -37,7 +37,7 @@ with the given id or class."
       (cl-destructuring-bind (cur &rest next) path
         ;; If the current item it the path is a list, treat it as a keyword list.
         (if (listp cur)
-            (cl-destructuring-bind (tag &key id class) cur
+            (cl-destructuring-bind (_tag &key id class) cur
               ;; Find the first tag matching the given class or id.
               (hdict:assoc-in
                next
@@ -51,10 +51,10 @@ with the given id or class."
           (hdict:assoc-in next (cdr (assoc cur alist)))))
     alist))
 
-(cl-defun hdict:tag-id ((&optional tag attrs &rest rest_))
+(cl-defun hdict:tag-id ((&optional _tag attrs &rest rest_))
   (cdr (assoc 'id attrs)))
 
-(cl-defun hdict:tag-class ((&optional tag attrs &rest rest_))
+(cl-defun hdict:tag-class ((&optional _tag attrs &rest rest_))
   (cdr (assoc 'class attrs)))
 
 ;; Plist conversion.
