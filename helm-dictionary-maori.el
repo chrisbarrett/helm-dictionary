@@ -113,6 +113,7 @@
 ;;;###autoload
 (defun helm-dictionary-maori ()
   "Perform a Māori dictionary search at <http://www.maoridictionary.co.nz>."
+  (interactive)
   (helm helm-source-maori-dictionary))
 
 (provide 'helm-dictionary-maori)
