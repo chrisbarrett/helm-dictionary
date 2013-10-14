@@ -63,7 +63,6 @@ with the given id or class."
 (cl-defun hdict:i->string ((_i _ str)) (propertize str 'face 'italic))
 (cl-defun hdict:b->string ((_b _ str)) (propertize str 'face 'bold))
 (cl-defun hdict:strong->string ((_strong _ str)) (propertize str 'face 'bold))
-(cl-defun hdict:br->string (&rest _) "\n")
 (cl-defun hdict:em->string ((_em &rest content))
   (concat "\n\n"
           (propertize (apply 'concat (-map 'hdict:element->string content))
@@ -72,6 +71,8 @@ with the given id or class."
 (defun hdict:element->string (x)
   (cond
    ((equal "\n" x) "")
+   ((null x) "")
+   ((symbolp x) "")
    ((stringp x) x)
    ((listp x)
     (cl-case (car x)
@@ -80,15 +81,15 @@ with the given id or class."
       ('em (hdict:em->string x))
       ('b (hdict:b->string x))
       ('strong (hdict:strong->string x))
-      ('br (hdict:br->string x))
+      ('br "\n")
       ('comment "")
       ('article "")
       ('class "")
       ('header "")
-      ('div (hdict:element->string (cdr x)))
-      (nil "")
+      ('span (s-join "" (-map 'hdict:element->string (cddr x))))
+      ('div  (s-join "" (-map 'hdict:element->string (cddr x))))
       (otherwise
-       (apply 'concat (-map 'hdict:element->string x)))))
+       (s-join "" (-map 'hdict:element->string x)))))
    (t
     "")))
 
