@@ -29,28 +29,42 @@
 (require 's)
 (require 'dash)
 
+(cl-defun hdict:find-by-constraint ((tag &key id class (nth 0)) alist)
+  "Find a tag grouping in ALIST matching a constraint."
+  (cl-loop with counter = 0
+           for elem in alist
+           ;; Test whether this element matches the given id or class
+           ;; constraint.
+           if (listp elem) for (hd _attrs . bod) = elem
+           if (and
+               (equal tag hd)
+               (or (null class) (ignore-errors (equal class (hdict:tag-class elem))))
+               (or (null id)    (ignore-errors (equal id (hdict:tag-id elem)))))
+           ;; If we have a match, check whether we're looking at the nth
+           ;; match for the above constraint. If so, return the tag's body
+           ;; from the loop.
+           do (if (equal counter nth)
+                  (cl-return bod)
+                (cl-incf counter))))
+
 (defun hdict:assoc-in (path alist)
   "Traverse xml ALIST along the given PATH of keys using `assoc'.
 Return nil if the path cannot be followed.
 
-Each element of PATH my be either a symbol or a list of the form
- (tag [:id|:class] \"label\"), which will attempt to match 'tag'
-with the given id or class."
+Each element of PATH may be either a symbol or a tag constraint of the form:
+
+ (tag [:nth n] [:id string] [:class string])
+
+If nth is given, match the nth occurrence of the tag.
+
+If class or id constraints are given, match only tags with those attributes. The nth
+constraint then matches the nth occurence of the given tag or class."
   (if (and path alist)
       (cl-destructuring-bind (cur &rest next) path
-        ;; If the current item it the path is a list, treat it as a keyword list.
+        ;; If the current item it the path is a list, treat it as a constraint
+        ;; list. Otherwise it's a symbol to match.
         (if (listp cur)
-            (cl-destructuring-bind (_tag &key id class) cur
-              ;; Find the first tag matching the given class or id.
-              (hdict:assoc-in
-               next
-               (cdr
-                (cl-loop for x in alist
-                         if (consp x)
-                         if (or (and class (equal class (hdict:tag-class x)))
-                                (and id (equal id (hdict:tag-id x))))
-                         do (return x)))))
-
+            (hdict:assoc-in next (hdict:find-by-constraint cur alist))
           (hdict:assoc-in next (cdr (assoc cur alist)))))
     alist))
 
