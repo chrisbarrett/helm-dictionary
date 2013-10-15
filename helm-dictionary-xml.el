@@ -59,14 +59,12 @@ with the given id or class."
 
 ;; Plist conversion.
 
-(cl-defun hdict:a->string ((_a _href str)) (propertize str 'face 'italic))
+(cl-defun hdict:a->string ((_a _attrs str)) (propertize str 'face 'italic))
 (cl-defun hdict:i->string ((_i _ str)) (propertize str 'face 'italic))
 (cl-defun hdict:b->string ((_b _ str)) (propertize str 'face 'bold))
 (cl-defun hdict:strong->string ((_strong _ str)) (propertize str 'face 'bold))
 (cl-defun hdict:em->string ((_em &rest content))
-  (concat "\n\n"
-          (propertize (apply 'concat (-map 'hdict:element->string content))
-                      'face 'italic)))
+  (concat "\n" (propertize (hdict:element->string content) 'face 'italic)))
 
 (defun hdict:element->string (x)
   (cond
@@ -77,17 +75,21 @@ with the given id or class."
    ((listp x)
     (cl-case (car x)
       ('a (hdict:a->string x))
-      ('i (hdict:i->string x))
-      ('em (hdict:em->string x))
-      ('b (hdict:b->string x))
-      ('strong (hdict:strong->string x))
-      ('br "\n")
-      ('comment "")
       ('article "")
+      ('audio "")
+      ('b (hdict:b->string x))
+      ('br "\n")
+      ('canvas "")
       ('class "")
+      ('comment "")
+      ('div (hdict:element->string (cddr x)))
+      ('em (hdict:em->string x))
       ('header "")
-      ('span (s-join "" (-map 'hdict:element->string (cddr x))))
-      ('div  (s-join "" (-map 'hdict:element->string (cddr x))))
+      ('i (hdict:i->string x))
+      ('img "")
+      ('span (hdict:element->string (cddr x)))
+      ('strong (hdict:strong->string x))
+      ('video "")
       (otherwise
        (s-join "" (-map 'hdict:element->string x)))))
    (t
