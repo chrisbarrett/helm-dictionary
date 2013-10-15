@@ -100,7 +100,6 @@
         (mdict:find-defs)
         (-mapcat 'mdict:section->definitions)))))
 
-
 (defun mdict:open-in-browser (_)
   (browse-url (mdict:format-query-url helm-pattern)))
 
@@ -111,7 +110,6 @@
     (action . mdict:open-in-browser)
     (volatile)
     (multiline)
-    (requires-pattern . 3)
     (delayed)))
 
 ;;;###autoload
