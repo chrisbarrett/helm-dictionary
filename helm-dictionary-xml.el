@@ -30,7 +30,14 @@
 (require 'dash)
 
 (cl-defun hdict:find-by-constraint ((tag &key id class (nth 0)) alist)
-  "Find a tag grouping in ALIST matching a constraint."
+  "Find a tag grouping in ALIST matching a constraint.
+
+If NTH is given, match the nth occurrence of the tag (starting
+from zero).
+
+When CLASS or ID constraints are given, accept only tags with
+attributes matching the given regular expression. The NTH
+constraint then returns the nth matching occurrence."
   (cl-loop with counter = 0
            for elem in alist
            ;; Test whether this element matches the given id or class
@@ -53,14 +60,8 @@
   "Traverse xml ALIST along the given PATH of keys using `assoc'.
 Return nil if the path cannot be followed.
 
-Each element of PATH may be either a symbol or a tag constraint of the form:
-
- (tag [:nth n] [:id regex] [:class regex])
-
-If nth is given, match the nth occurrence of the tag.
-
-If class or id constraints are given, match only tags with those attributes. The nth
-constraint then matches the nth occurence of the given tag or class."
+Each element of PATH may be either a symbol or a tag constraint
+of the form accepted by `hdict:find-by-constraint'."
   (if (and path alist)
       (cl-destructuring-bind (cur &rest next) path
         ;; If the current item it the path is a list, treat it as a constraint
