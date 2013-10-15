@@ -55,7 +55,7 @@ Return nil if the path cannot be followed.
 
 Each element of PATH may be either a symbol or a tag constraint of the form:
 
- (tag [:nth n] [:id string] [:class string])
+ (tag [:nth n] [:id regex] [:class regex])
 
 If nth is given, match the nth occurrence of the tag.
 
