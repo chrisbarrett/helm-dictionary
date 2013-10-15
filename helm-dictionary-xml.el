@@ -22,7 +22,8 @@
 
 ;;; Commentary:
 
-;; Parser utilites for XML.
+;; Utilities for working with alist representations of XML, as output by
+;; functions like `libxml-parse-html-region'.
 
 ;;; Code:
 
