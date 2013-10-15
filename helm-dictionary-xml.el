@@ -26,6 +26,9 @@
 
 ;;; Code:
 
+(require 's)
+(require 'dash)
+
 (defun hdict:assoc-in (path alist)
   "Traverse xml ALIST along the given PATH of keys using `assoc'.
 Return nil if the path cannot be followed.
