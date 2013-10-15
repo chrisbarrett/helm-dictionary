@@ -79,15 +79,13 @@
       (fill-region (point-min) (point-max)))
     (s-trim (buffer-string))))
 
-(defun mdict:plist->definitions (plist)
-  (-mapcat
-   (lambda (section)
-     (let ((word (cadr (hdict:assoc-in '(div h2) section))))
-       (->> (cdr (hdict:assoc-in '(ul li) section))
-         (-map 'mdict:def->string)
-         (-remove (-compose 's-blank? 's-trim))
-         (--map (mdict:format-candidate (concat word " : " it))))))
-   (mdict:find-defs plist)))
+(defun mdict:section->definitions (section)
+  (let ((word (cadr (hdict:assoc-in '(div h2) section))))
+    (->> (cdr (hdict:assoc-in '(ul li) section))
+      (-map 'mdict:def->string)
+      (-remove (-compose 's-blank? 's-trim))
+      (--map (mdict:format-candidate (concat (propertize word 'face 'bold)
+                                             " : " it))))))
 
 (defun mdict:format-query-url (query)
   (concat "http://www.maoridictionary.co.nz/index.cfm"
@@ -98,8 +96,10 @@
   "Search for QUERY and parse it into a list of definitions for helm."
   (let ((url (mdict:format-query-url query)))
     (with-current-buffer (url-retrieve-synchronously url)
-      (mdict:plist->definitions
-       (libxml-parse-html-region (point-min) (point-max))))))
+      (->> (libxml-parse-html-region (point-min) (point-max))
+        (mdict:find-defs)
+        (-mapcat 'mdict:section->definitions)))))
+
 
 (defun mdict:open-in-browser (_)
   (browse-url (mdict:format-query-url helm-pattern)))
