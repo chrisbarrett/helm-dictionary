@@ -38,8 +38,10 @@
            if (listp elem) for (hd _attrs . bod) = elem
            if (and
                (equal tag hd)
-               (or (null class) (ignore-errors (equal class (hdict:tag-class elem))))
-               (or (null id)    (ignore-errors (equal id (hdict:tag-id elem)))))
+               (or (null class)
+                   (ignore-errors (s-matches? class (hdict:tag-class elem))))
+               (or (null id)
+                   (ignore-errors (s-matches? id (hdict:tag-id elem)))))
            ;; If we have a match, check whether we're looking at the nth
            ;; match for the above constraint. If so, return the tag's body
            ;; from the loop.
