@@ -5,6 +5,7 @@
 Provides functions for searching online dictionaries using helm.
 
 * Supported languages
+- English
 - Māori
 
 * Contributing
