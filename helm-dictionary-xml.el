@@ -59,12 +59,23 @@ with the given id or class."
 
 ;; Plist conversion.
 
-(cl-defun hdict:a->string ((_a _attrs str)) (propertize str 'face 'italic))
-(cl-defun hdict:i->string ((_i _ str)) (propertize str 'face 'italic))
-(cl-defun hdict:b->string ((_b _ str)) (propertize str 'face 'bold))
-(cl-defun hdict:strong->string ((_strong _ str)) (propertize str 'face 'bold))
-(cl-defun hdict:em->string ((_em &rest content))
+(cl-defun hdict:a->string ((&optional _a _attrs content &rest rest_))
+  (propertize (hdict:element->string content) 'face 'italic))
+
+(cl-defun hdict:i->string ((&optional _i _ content))
+  (propertize (hdict:element->string content) 'face 'italic))
+
+(cl-defun hdict:b->string ((&optional _b _ content))
+  (propertize (hdict:element->string content) 'face 'bold))
+
+(cl-defun hdict:strong->string ((&optional _strong _ content))
+  (propertize (hdict:element->string content) 'face 'bold))
+
+(cl-defun hdict:em->string ((&optional _em &rest content))
   (concat "\n" (propertize (hdict:element->string content) 'face 'italic)))
+
+(cl-defun hdict:list->string ((&optional _tag _attrs &rest elems))
+  (hdict:element->string elems))
 
 (defun hdict:element->string (x)
   (cond
@@ -75,7 +86,7 @@ with the given id or class."
    ((listp x)
     (cl-case (car x)
       ('a (hdict:a->string x))
-      ('article "")
+      ('article (hdict:list->string x))
       ('audio "")
       ('b (hdict:b->string x))
       ('br "\n")
@@ -84,12 +95,23 @@ with the given id or class."
       ('comment "")
       ('div (hdict:element->string (cddr x)))
       ('em (hdict:em->string x))
+      ('footer "")
+      ('form "")
       ('header "")
       ('i (hdict:i->string x))
+      ('id "")
       ('img "")
+      ('link "")
+      ('meta "")
+      ('nav "")
+      ('ol (hdict:list->string x))
+      ('option "")
       ('section (hdict:element->string (cddr x)))
+      ('script "")
       ('span (hdict:element->string (cddr x)))
       ('strong (hdict:strong->string x))
+      ('table "")
+      ('ul (hdict:list->string x))
       ('video "")
       (otherwise
        (s-join "" (-map 'hdict:element->string x)))))
