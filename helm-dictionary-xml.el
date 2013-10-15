@@ -104,6 +104,7 @@ with the given id or class."
       ('link "")
       ('meta "")
       ('nav "")
+      ('noscript "")
       ('ol (hdict:list->string x))
       ('option "")
       ('section (hdict:element->string (cddr x)))
