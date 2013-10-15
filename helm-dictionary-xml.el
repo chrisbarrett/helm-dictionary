@@ -99,6 +99,8 @@ of the form accepted by `hdict:find-by-constraint'."
   (hdict:element->string elems))
 
 (defun hdict:element->string (x)
+  "Convert XML alist X to a string representation.
+The output string will be propertized according to the markup."
   (cond
    ((equal "\n" x) "")
    ((null x) "")
