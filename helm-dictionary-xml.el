@@ -87,6 +87,7 @@ with the given id or class."
       ('header "")
       ('i (hdict:i->string x))
       ('img "")
+      ('section (hdict:element->string (cddr x)))
       ('span (hdict:element->string (cddr x)))
       ('strong (hdict:strong->string x))
       ('video "")
